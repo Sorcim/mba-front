@@ -2,8 +2,8 @@ import { FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
-  const [email, setEmail] = useState('bank@pesquer.fr')
-  const [password, setPassword] = useState('secret')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const navigate = useNavigate()
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
