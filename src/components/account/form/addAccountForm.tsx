@@ -8,11 +8,7 @@ type AddAccountFormProps = {
   afterSubmit?: () => void
 }
 const AddAccountForm = ({ afterSubmit }: AddAccountFormProps) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>()
+  const { register, handleSubmit } = useForm<Inputs>()
   const { handleModal } = useContext(ModalContext) as ModalContextType
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     fetch(`http://localhost:3333/api/v1/account/`, {

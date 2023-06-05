@@ -13,11 +13,7 @@ const EditFormScheduledTransaction = ({
   scheduledTransaction,
   afterSubmit,
 }: EditFormScheduledTransactionProps) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>()
+  const { register, handleSubmit } = useForm<Inputs>()
   const { handleModal } = useContext(ModalContext) as ModalContextType
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     fetch(
