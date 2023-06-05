@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react'
+import { createContext, useState } from 'react'
 import { AccountType } from '../types/Account'
 import { useParams } from 'react-router-dom'
 import useSWR from 'swr'

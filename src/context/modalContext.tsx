@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren } from 'react'
+import { createContext, PropsWithChildren } from 'react'
 import useModal from '../hooks/useModal'
 import Modal from '../components/modal/modal'
 

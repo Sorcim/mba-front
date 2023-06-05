@@ -15,11 +15,7 @@ const AddFormTransaction = ({
   afterSubmit,
   accountId,
 }: FormTransactionProps) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>()
+  const { register, handleSubmit } = useForm<Inputs>()
   const { handleModal } = useContext(ModalContext) as ModalContextType
   const { mutate } = useSWRConfig()
   const onSubmit: SubmitHandler<Inputs> = (data) => {

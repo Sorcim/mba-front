@@ -16,11 +16,7 @@ type Inputs = Pick<
 const AddFormScheduledTransaction = ({
   afterSubmit,
 }: FormScheduledTransactionProps) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>()
+  const { register, handleSubmit } = useForm<Inputs>()
   const { id } = useParams()
   const { handleModal } = useContext(ModalContext) as ModalContextType
   const onSubmit: SubmitHandler<Inputs> = (data) => {
