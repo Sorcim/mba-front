@@ -1,4 +1,5 @@
 ARG NODE_IMAGE=node:alpine
+ARG NGINX_IMAGE=nginx:alpine
 
 FROM $NODE_IMAGE AS base
 RUN mkdir -p /home/node/app && chown node:node /home/node/app
@@ -13,9 +14,6 @@ COPY --chown=node:node . .
 FROM dependencies AS build
 RUN npm run build
 
-FROM base AS production
-COPY --chown=node:node ./package*.json ./
-RUN npm ci --production
-COPY --chown=node:node --from=build /home/node/app/build .
-EXPOSE 3000
-CMD [ "npm", "run", "vite" ]
+FROM $NGINX_IMAGE AS production
+COPY --chown=node:node --from=build /home/node/app/build /usr/share/nginx/html
+EXPOSE 80
