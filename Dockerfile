@@ -15,5 +15,5 @@ FROM dependencies AS build
 RUN npm run build
 
 FROM $NGINX_IMAGE AS production
-COPY --chown=node:node --from=build /home/node/app/build /usr/share/nginx/html
+COPY --chown=node:node --from=build /home/node/app/dist /usr/share/nginx/html
 EXPOSE 80
