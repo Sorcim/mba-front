@@ -1,6 +1,9 @@
 import { useContext } from 'react'
 import { ModalContext, ModalContextType } from '../../../context/modalContext'
 import { ScheduledTransactionType } from '../../../types/ScheduledTransaction'
+import useSWRMutation from 'swr/mutation'
+import HttpClient from '../../../api/HttpClient.ts'
+import { ScheduledTransactionApi } from '../../../api/ScheduledTransactionApi.ts'
 
 type Props = {
   scheduledTransaction: ScheduledTransactionType
@@ -12,34 +15,31 @@ const DeleteScheduledTransactionModal = ({
   afterDelete,
 }: Props) => {
   const { handleModal } = useContext(ModalContext) as ModalContextType
-
-  const handleDelete = (scheduledTransaction: ScheduledTransactionType) => {
-    fetch(
-      `http://localhost:3333/api/v1/account/${scheduledTransaction.account_id}/scheduled_transaction/${scheduledTransaction.id}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+  const { trigger } = useSWRMutation(
+    ScheduledTransactionApi.url(
+      scheduledTransaction.account_id,
+      scheduledTransaction.id
+    ).delete,
+    HttpClient.delete
+  )
+  const handleDelete = async () => {
+    try {
+      await trigger()
+      if (afterDelete) {
+        afterDelete()
       }
-    ).then((r) => {
-      if (r.status === 401) {
-        console.log('error')
-      } else {
-        if (afterDelete) {
-          afterDelete()
-        }
-        handleModal()
-      }
-    })
+      handleModal()
+    } catch (e) {
+      console.error(e)
+    }
   }
+
   return (
     <div>
       <p>Confirmer la suppression ?</p>
       <button
         className="px-4 py-2 text-white bg-red-600 rounded-lg duration-150 hover:bg-red-700 active:shadow-lg"
-        onClick={() => handleDelete(scheduledTransaction)}
+        onClick={() => handleDelete()}
       >
         Supprimer
       </button>{' '}

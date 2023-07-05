@@ -1,17 +1,15 @@
 import Account from '../components/account/account'
 import { AccountType } from '../types/Account'
 import Default from '../layouts/_default'
-import useSWR from 'swr'
-import fetcher from '../api/fetcher'
 import AddModalButton from '../components/modal/button/addModalButton'
-import { ModalProvider } from '../context/modalContext'
 import AddAccountForm from '../components/account/form/addAccountForm'
+import { ModalProvider } from '../context/modalContext'
+import useSWR from 'swr'
+import { AccountApi } from '../api/AccountApi.ts'
+import HttpClient from '../api/HttpClient.ts'
 
 const Accounts = () => {
-  const { data, mutate } = useSWR(
-    `http://localhost:3333/api/v1/account`,
-    fetcher
-  )
+  const { data, mutate } = useSWR(AccountApi.url().get, HttpClient.get)
   return (
     <Default>
       <section className="py-28">

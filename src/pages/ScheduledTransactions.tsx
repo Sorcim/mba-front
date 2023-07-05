@@ -1,13 +1,14 @@
 import { useParams } from 'react-router-dom'
 import Default from '../layouts/_default'
 import useSWRInfinite from 'swr/infinite'
-import fetcher from '../api/fetcher'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { ScheduledTransactionType } from '../types/ScheduledTransaction'
 import { ModalProvider } from '../context/modalContext'
 import AddFormScheduledTransaction from '../components/scheduledTransaction/form/addFormScheduledTransaction'
 import ScheduledTransactionTableRow from '../components/scheduledTransaction/scheduledTransactionTableRow'
 import AddModalButton from '../components/modal/button/addModalButton'
+import { ScheduledTransactionApi } from '../api/ScheduledTransactionApi.ts'
+import HttpClient from '../api/HttpClient.ts'
 
 type ResultProps = {
   data: Array<ScheduledTransactionType>
@@ -22,9 +23,7 @@ type ResultProps = {
 const ScheduledTransactions = () => {
   const { id } = useParams()
   const getKey = (index: number) => {
-    return `http://localhost:3333/api/v1/account/${id}/scheduled_transaction?page=${
-      index + 1
-    }`
+    return `${ScheduledTransactionApi.url(Number(id)).get}?page=${index + 1}`
   }
   const {
     data: transactions,
@@ -34,7 +33,7 @@ const ScheduledTransactions = () => {
     mutate,
   } = useSWRInfinite<ResultProps, Error>(
     (index: number) => getKey(index),
-    fetcher,
+    HttpClient.get,
     { revalidateAll: true }
   )
 

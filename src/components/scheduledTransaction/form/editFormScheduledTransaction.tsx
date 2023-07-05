@@ -2,6 +2,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useContext } from 'react'
 import { ModalContext, ModalContextType } from '../../../context/modalContext'
 import { ScheduledTransactionType } from '../../../types/ScheduledTransaction'
+import useSWRMutation from 'swr/mutation'
+import { ScheduledTransactionApi } from '../../../api/ScheduledTransactionApi.ts'
+import HttpClient from '../../../api/HttpClient.ts'
 type EditFormScheduledTransactionProps = {
   scheduledTransaction: ScheduledTransactionType
   afterSubmit?: () => void
@@ -15,27 +18,23 @@ const EditFormScheduledTransaction = ({
 }: EditFormScheduledTransactionProps) => {
   const { register, handleSubmit } = useForm<Inputs>()
   const { handleModal } = useContext(ModalContext) as ModalContextType
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    fetch(
-      `http://localhost:3333/api/v1/account/${scheduledTransaction.account_id}/scheduled_transaction/${scheduledTransaction.id}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+  const { trigger } = useSWRMutation(
+    ScheduledTransactionApi.url(
+      scheduledTransaction.account_id,
+      scheduledTransaction.id
+    ).create,
+    HttpClient.put
+  )
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    try {
+      await trigger(data)
+      if (afterSubmit) {
+        afterSubmit()
       }
-    ).then((r) => {
-      if (r.status === 401) {
-        console.log('error')
-      } else {
-        if (afterSubmit) {
-          afterSubmit()
-        }
-        handleModal()
-      }
-    })
+      handleModal()
+    } catch (e) {
+      console.error(e)
+    }
   }
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

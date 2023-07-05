@@ -1,8 +1,10 @@
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useSWRConfig } from 'swr'
 import { useContext } from 'react'
 import { ModalContext, ModalContextType } from '../../../context/modalContext'
 import { TransactionType } from '../../../types/Transaction'
+import useSWRMutation from 'swr/mutation'
+import HttpClient from '../../../api/HttpClient.ts'
+import { TransactionApi } from '../../../api/TransactionApi.ts'
 
 type FormTransactionProps = {
   afterSubmit?: () => void
@@ -17,29 +19,20 @@ const AddFormTransaction = ({
 }: FormTransactionProps) => {
   const { register, handleSubmit } = useForm<Inputs>()
   const { handleModal } = useContext(ModalContext) as ModalContextType
-  const { mutate } = useSWRConfig()
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    fetch(`http://localhost:3333/api/v1/account/${accountId}/transaction`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    }).then((r) => {
-      if (r.status === 401) {
-        console.log('error')
-      } else {
-        mutate(
-          `http://localhost:3333/api/v1/account/${accountId}/transaction`
-        ).then(() => {
-          if (afterSubmit) {
-            afterSubmit()
-          }
-          handleModal()
-        })
+  const { trigger } = useSWRMutation(
+    TransactionApi.url(Number(accountId)).create,
+    HttpClient.post
+  )
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    try {
+      await trigger(data)
+      if (afterSubmit) {
+        afterSubmit()
       }
-    })
+      handleModal()
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (
