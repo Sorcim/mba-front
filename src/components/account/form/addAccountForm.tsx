@@ -2,6 +2,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useContext } from 'react'
 import { ModalContext, ModalContextType } from '../../../context/modalContext'
 import { AccountType } from '../../../types/Account'
+import useSWRMutation from 'swr/mutation'
+import { AccountApi } from '../../../api/AccountApi.ts'
+import HttpClient from '../../../api/HttpClient.ts'
 
 type Inputs = Partial<AccountType>
 type AddAccountFormProps = {
@@ -10,24 +13,17 @@ type AddAccountFormProps = {
 const AddAccountForm = ({ afterSubmit }: AddAccountFormProps) => {
   const { register, handleSubmit } = useForm<Inputs>()
   const { handleModal } = useContext(ModalContext) as ModalContextType
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    fetch(`http://localhost:3333/api/v1/account/`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    }).then((r) => {
-      if (r.status === 401) {
-        console.log('error')
-      } else {
-        if (afterSubmit) {
-          afterSubmit()
-        }
-        handleModal()
+  const { trigger } = useSWRMutation(AccountApi.url().create, HttpClient.post)
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    try {
+      await trigger(data)
+      if (afterSubmit) {
+        afterSubmit()
       }
-    })
+      handleModal()
+    } catch (e) {
+      console.error(e)
+    }
   }
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

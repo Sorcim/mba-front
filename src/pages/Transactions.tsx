@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom'
 import Default from '../layouts/_default'
 import useSWRInfinite from 'swr/infinite'
 import useSWR from 'swr'
-import fetcher from '../api/fetcher'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import TransactionTableRow from '../components/transaction/transactionTableRow'
 import { TransactionType } from '../types/Transaction'
@@ -10,6 +9,10 @@ import { ModalProvider } from '../context/modalContext'
 import AddFormTransaction from '../components/transaction/form/add'
 import AmountField from '../components/fields/amountField'
 import AddModalButton from '../components/modal/button/addModalButton'
+import httpClient from '../api/HttpClient.ts'
+import { AccountApi } from '../api/AccountApi.ts'
+import HttpClient from '../api/HttpClient.ts'
+import { TransactionApi } from '../api/TransactionApi.ts'
 
 type ResultProps = {
   data: Array<TransactionType>
@@ -25,9 +28,7 @@ const Transactions = () => {
   const { id } = useParams()
 
   const getKey = (index: number) => {
-    return `http://localhost:3333/api/v1/account/${id}/transaction?search=Spotify&page=${
-      index + 1
-    }`
+    return `${TransactionApi.url(Number(id)).get}?page=${index + 1}`
   }
   const {
     data: transactions,
@@ -37,13 +38,13 @@ const Transactions = () => {
     mutate,
   } = useSWRInfinite<ResultProps, Error>(
     (index: number) => getKey(index),
-    fetcher,
+    HttpClient.get,
     { revalidateAll: true }
   )
 
   const { data: account, mutate: accountMutate } = useSWR(
-    `http://localhost:3333/api/v1/account/${id}`,
-    fetcher
+    AccountApi.url(Number(id)).show,
+    httpClient.get
   )
 
   const handleNext = () => {

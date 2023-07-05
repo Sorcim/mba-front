@@ -1,15 +1,16 @@
 import { useContext, useState } from 'react'
 import useSWR from 'swr'
-import fetcher from '../../api/fetcher'
 import { useNavigate } from 'react-router-dom'
 import { AccountType } from '../../types/Account'
 import {
   AccountContext,
   AccountContextType,
 } from '../../context/accountContext'
+import { AccountApi } from '../../api/AccountApi.ts'
+import HttpClient from '../../api/HttpClient.ts'
 
 export const SelectAccount = () => {
-  const { data } = useSWR(`http://localhost:3333/api/v1/account`, fetcher)
+  const { data } = useSWR(AccountApi.url().get, HttpClient.get)
   const { handleSetAccount, account } = useContext(
     AccountContext
   ) as AccountContextType

@@ -2,7 +2,8 @@ import { createContext, useState } from 'react'
 import { AccountType } from '../types/Account'
 import { useParams } from 'react-router-dom'
 import useSWR from 'swr'
-import fetcher from '../api/fetcher'
+import { AccountApi } from '../api/AccountApi.ts'
+import HttpClient from '../api/HttpClient.ts'
 
 export type AccountContextType = {
   account: AccountType | null
@@ -18,8 +19,8 @@ const AccountProvider = ({ children }: AccountProviderProps) => {
   const { id } = useParams()
   const shouldFetch = account === null && id !== undefined
   const { data } = useSWR(
-    shouldFetch ? `http://localhost:3333/api/v1/account/${id}` : null,
-    fetcher
+    shouldFetch ? AccountApi.url(Number(id)).show : null,
+    HttpClient.get
   )
   const handleSetAccount = (account: AccountType | null) => {
     setAccount(account)

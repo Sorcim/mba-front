@@ -1,6 +1,9 @@
 import { useContext } from 'react'
 import { ModalContext, ModalContextType } from '../../../context/modalContext'
 import { AccountType } from '../../../types/Account'
+import useSWRMutation from 'swr/mutation'
+import { AccountApi } from '../../../api/AccountApi.ts'
+import HttpClient from '../../../api/HttpClient.ts'
 
 type Props = {
   account: AccountType
@@ -9,31 +12,27 @@ type Props = {
 
 const DeleteAccountModal = ({ account, afterDelete }: Props) => {
   const { handleModal } = useContext(ModalContext) as ModalContextType
-
-  const handleDelete = (account: AccountType) => {
-    fetch(`http://localhost:3333/api/v1/account/${account.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    }).then((r) => {
-      if (r.status === 401) {
-        console.log('error')
-      } else {
-        if (afterDelete) {
-          afterDelete()
-        }
-        handleModal()
+  const { trigger } = useSWRMutation(
+    AccountApi.url(account.id).delete,
+    HttpClient.delete
+  )
+  const handleDelete = async () => {
+    try {
+      await trigger()
+      if (afterDelete) {
+        afterDelete()
       }
-    })
+      handleModal()
+    } catch (e) {
+      console.error(e)
+    }
   }
   return (
     <div>
       <p>Confirmer la suppression ?</p>
       <button
         className="px-4 py-2 text-white bg-red-600 rounded-lg duration-150 hover:bg-red-700 active:shadow-lg"
-        onClick={() => handleDelete(account)}
+        onClick={() => handleDelete()}
       >
         Supprimer
       </button>{' '}
