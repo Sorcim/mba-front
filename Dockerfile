@@ -16,5 +16,4 @@ RUN npm run build
 
 FROM $NGINX_IMAGE AS production
 COPY --chown=node:node --from=build /home/node/app/dist /usr/share/nginx/html
-COPY --chown=node:node ./docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
