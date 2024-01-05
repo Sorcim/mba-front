@@ -17,3 +17,4 @@ RUN npm run build
 FROM $NGINX_IMAGE AS production
 COPY --chown=node:node --from=build /home/node/app/dist /usr/share/nginx/html
 EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
