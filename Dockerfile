@@ -5,11 +5,12 @@ FROM $NODE_IMAGE AS base
 WORKDIR /app
 
 FROM base AS dependencies
-COPY ./package*.json ./
-RUN npm ci
-COPY . .
+COPY package*.json ./
+RUN npm install
+COPY . ./
 
 FROM dependencies AS build
+
 RUN npm run build
 
 FROM $NGINX_IMAGE AS production
